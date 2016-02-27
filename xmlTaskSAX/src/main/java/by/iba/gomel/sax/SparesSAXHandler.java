@@ -70,7 +70,7 @@ public class SparesSAXHandler extends DefaultHandler {
     @Override
     public void endDocument() throws SAXException {
         this.process = null;
-        this.currentPosition = 0;
+        this.currentPosition = Constants.ONE;
     }
 
     @Override
