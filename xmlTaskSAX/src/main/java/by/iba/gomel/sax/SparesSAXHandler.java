@@ -1,18 +1,12 @@
 package by.iba.gomel.sax;
 
-import java.io.IOException;
 import java.util.EnumSet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import by.iba.gomel.Constants;
-import by.iba.gomel.process.OutputSpareProcess;
 import by.iba.gomel.process.Process;
 import by.iba.gomel.spare.Spare;
 
@@ -21,10 +15,6 @@ import by.iba.gomel.spare.Spare;
  */
 public class SparesSAXHandler extends DefaultHandler {
 
-    private static final Logger           LOGGER          = LoggerFactory
-            .getLogger(SparesSAXHandler.class);
-    private XMLReader                     reader;
-    private final String                  pathToXMLFile;
     private Spare                         currentSpare    = null;
     private SparesElements                currentEnum     = null;
     private Process                       process         = null;
@@ -34,15 +24,8 @@ public class SparesSAXHandler extends DefaultHandler {
     /**
      * Constructor creates set of spares.
      */
-    public SparesSAXHandler(final String pathToXMLFile) {
+    public SparesSAXHandler() {
         this.rangeSpareFeatures = EnumSet.range(SparesElements.MARKAUTO, SparesElements.COST);
-        this.pathToXMLFile = pathToXMLFile;
-        try {
-            this.reader = XMLReaderFactory.createXMLReader();
-            this.reader.setContentHandler(this);
-        } catch (final SAXException e) {
-            SparesSAXHandler.LOGGER.error(Constants.SAX_EXCEPTION, e);
-        }
     }
 
     @Override
@@ -82,19 +65,13 @@ public class SparesSAXHandler extends DefaultHandler {
         }
     }
 
-    public void showAllSpares() {
-        this.process = new OutputSpareProcess();
-        final String header = String.format(Constants.FORMAT_HEADER, Constants.PHRASE_ITEM,
-                Constants.PHRASE_ID, Constants.PHRASE_MARK_AUTO, Constants.PHRASE_MODEL_AUTO,
-                Constants.PHRASE_COST);
-        SparesSAXHandler.LOGGER.info(header + Constants.DIVIDING_LINE);
-        try {
-            this.reader.parse(this.pathToXMLFile);
-        } catch (final IOException e) {
-            SparesSAXHandler.LOGGER.error(Constants.IO_EXCEPTION, e);
-        } catch (final SAXException e) {
-            SparesSAXHandler.LOGGER.error(Constants.SAX_EXCEPTION, e);
-        }
+    /**
+     *
+     * @param process
+     *            set the process: show or search.
+     */
+    public void setProcess(final Process process) {
+        this.process = process;
     }
 
     @Override

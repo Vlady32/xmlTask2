@@ -1,8 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<tns:spares 
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  xmlns:tns="http://www.example.org/spares"
-  xsi:schemaLocation="http://www.example.org/spares sparesXSD.xsd">
+<?xml version="1.0" encoding="UTF-8"?><tns:spares xmlns:tns="http://www.example.org/spares" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/spares sparesXSD.xsd">
   <spare key="s1">
     <markAuto>Audi</markAuto>
     <modelAuto>A6</modelAuto>
@@ -16,6 +12,6 @@
   <spare key="s3">
     <markAuto>Mazda</markAuto>
     <modelAuto>626</modelAuto>
-    <cost>150000</cost>
+    <cost>110000</cost>
   </spare>
 </tns:spares>
