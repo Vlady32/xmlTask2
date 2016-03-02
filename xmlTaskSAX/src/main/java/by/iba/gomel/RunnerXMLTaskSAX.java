@@ -22,8 +22,8 @@ public class RunnerXMLTaskSAX {
      *            input parameters (not used).
      * @throws FileNotFoundException
      */
-    public static void main(final String[] args) throws FileNotFoundException {
-        Menu.showMenu();
+    public static void main(final String[] args) {
+        new Menu().showMenu();
     }
 
 }

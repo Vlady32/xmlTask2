@@ -3,6 +3,8 @@ package by.iba.gomel.sax;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.util.Scanner;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -34,22 +36,23 @@ import by.iba.gomel.spare.Spare;
 public class SparesSAXBuilder {
 
     private static final Logger    LOGGER = LoggerFactory.getLogger(SparesSAXBuilder.class);
+    private Scanner                in     = new Scanner(System.in, Charset.defaultCharset().name());
     private final SparesSAXHandler saxHandler;
     private XMLReader              reader;
     private String                 pathToXMLFile;
     private final String           pathToXSDFile;
-    private final boolean          isValidateXML;
 
     /**
      *
      * @param pathToXMLFile
      *            path to xml file.
      */
-    public SparesSAXBuilder(final String pathToXMLFile, final String pathToXSDFile) {
+    public SparesSAXBuilder(final String pathToXMLFile, final String pathToXSDFile,
+            final Scanner in) {
+        this.in = in;
         this.saxHandler = new SparesSAXHandler();
         this.pathToXMLFile = pathToXMLFile;
         this.pathToXSDFile = pathToXSDFile;
-        this.isValidateXML = ValidatorSAXXSD.validate(pathToXMLFile, pathToXSDFile);
         try {
             this.reader = XMLReaderFactory.createXMLReader();
             this.reader.setContentHandler(this.saxHandler);
@@ -91,10 +94,27 @@ public class SparesSAXBuilder {
     /**
      *
      * @param key
+     *            key for updating.
+     * @param markAuto
+     *            new mark auto.
+     * @param modelAuto
+     *            new model auto.
+     * @param cost
+     *            new cost.
+     */
+    public void changeRecord(final String key, final String markAuto, final String modelAuto,
+            final int cost) {
+        final XMLReader xr = new UpdateFilter(this.reader, key, markAuto, modelAuto, cost);
+        this.writeToFile(xr, this.pathToXMLFile, true);
+    }
+
+    /**
+     *
+     * @param key
      *            key for deleting.
      */
     public void deleteRecord(final String key) {
-        final XMLReader xr = new DeleteFilter(this.reader, key);
+        final XMLReader xr = new DeleteFilter(this.reader, key, this.in);
         this.writeToFile(xr, this.pathToXMLFile, false);
     }
 
@@ -117,10 +137,6 @@ public class SparesSAXBuilder {
      *            searching information in xml file.
      */
     public void searchRecord(final String searchInfo) {
-        if (!this.isValidateXML) {
-            SparesSAXBuilder.LOGGER.info(Constants.ERROR_XSD);
-            return;
-        }
         this.saxHandler.setProcess(new SearchSpareProcess(searchInfo.toLowerCase()));
         final String header = String.format(Constants.FORMAT_HEADER, Constants.PHRASE_ITEM,
                 Constants.PHRASE_KEY, Constants.PHRASE_MARK_AUTO, Constants.PHRASE_MODEL_AUTO,
@@ -138,11 +154,7 @@ public class SparesSAXBuilder {
     /**
      * To print out all spares to console.
      */
-    public void showAllSpares() {
-        if (!this.isValidateXML) {
-            SparesSAXBuilder.LOGGER.info(Constants.ERROR_XSD);
-            return;
-        }
+    public void showAllRecords() {
         this.saxHandler.setProcess(new OutputSpareProcess());
         final String header = String.format(Constants.FORMAT_HEADER, Constants.PHRASE_ITEM,
                 Constants.PHRASE_KEY, Constants.PHRASE_MARK_AUTO, Constants.PHRASE_MODEL_AUTO,
@@ -155,23 +167,6 @@ public class SparesSAXBuilder {
         } catch (final SAXException e) {
             SparesSAXBuilder.LOGGER.error(Constants.SAX_EXCEPTION, e);
         }
-    }
-
-    /**
-     *
-     * @param key
-     *            key for updating.
-     * @param markAuto
-     *            new mark auto.
-     * @param modelAuto
-     *            new model auto.
-     * @param cost
-     *            new cost.
-     */
-    public void updateRecord(final String key, final String markAuto, final String modelAuto,
-            final int cost) {
-        final XMLReader xr = new UpdateFilter(this.reader, key, markAuto, modelAuto, cost);
-        this.writeToFile(xr, this.pathToXMLFile, true);
     }
 
     /**
